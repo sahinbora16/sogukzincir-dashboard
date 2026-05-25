@@ -4,15 +4,15 @@ services:
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: sogukzincir
-      POSTGRES_PASSWORD: sogukzincir
-      POSTGRES_DB: sogukzincir_db
+      POSTGRES_USER: ${DB_USER:-sogukzincir}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      POSTGRES_DB: ${DB_NAME:-sogukzincir_db}
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U sogukzincir"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-sogukzincir}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -27,7 +27,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgresql+asyncpg://sogukzincir:sogukzincir@postgres:5432/sogukzincir_db
+      DATABASE_URL: postgresql+asyncpg://${DB_USER:-sogukzincir}:${DB_PASSWORD}@postgres:5432/${DB_NAME:-sogukzincir_db}
       REDIS_URL: redis://redis:6379
     depends_on:
       postgres:
